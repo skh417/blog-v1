@@ -1,20 +1,32 @@
-import { blogPosts, getAllPosts } from "../../lib/data";
+import { getAllPosts } from "../../lib/data";
 
-export default function Post({ title, content }) {
-  return <div>{title ? title : "제목없음"}</div>;
+export default function Post({ title, date, content }) {
+  return (
+    <div>
+      <h2>{title}</h2>
+      <div>{date}</div>
+      <div>{content}</div>
+    </div>
+  );
 }
 
 export async function getStaticProps(context) {
   const { params } = context;
+  const allPosts = getAllPosts();
+  const { data, content } = allPosts.find((item) => item.slug === params.slug);
+
   return {
-    props: blogPosts.find((item) => item.slug === params.slug),
+    props: {
+      ...data,
+      date: data.date.toString(),
+      content,
+    },
   };
 }
 
 export async function getStaticPaths() {
-  getAllPosts();
   return {
-    paths: blogPosts.map((post) => ({ params: { slug: post.slug } })), // See the "paths" section below
+    paths: getAllPosts().map((post) => ({ params: { slug: post.slug } })), // See the "paths" section below
     fallback: false,
   };
 }

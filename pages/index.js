@@ -1,6 +1,12 @@
 import Head from "next/head";
+import Link from "next/link";
+import { blogPosts } from "../lib/data";
+import path from "path";
+import { cwd } from "process";
 
 export default function Home() {
+  const postsDirectory = path.join(cwd(), "posts");
+
   return (
     <>
       <Head>
@@ -11,6 +17,20 @@ export default function Home() {
 
       <main>
         <h1>블로그 만들기 도전</h1>
+
+        <div>
+          {blogPosts.map((post) => (
+            <div key={post.slug}>
+              <div>
+                <Link href={`/blog/${post.slug}`}>
+                  <a>{post.title}</a>
+                </Link>
+              </div>
+
+              <div>{post.content}</div>
+            </div>
+          ))}
+        </div>
       </main>
     </>
   );

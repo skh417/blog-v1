@@ -1,8 +1,10 @@
 import Head from "next/head";
 import Link from "next/link";
-// import { blogPosts } from "../lib/data";
+import { format, parseISO, formatDistance, subDays } from "date-fns";
+import { getAllPosts } from "../lib/data";
 
-export default function Home() {
+export default function Home({ posts }) {
+  console.log(posts);
   return (
     <>
       <Head>
@@ -14,8 +16,45 @@ export default function Home() {
       <main>
         <h1>블로그 만들기 도전</h1>
 
-        <div>??</div>
+        <div>
+          {posts.map((item) => (
+            <PostListItem key={item.slug} {...item} />
+          ))}
+        </div>
       </main>
     </>
+  );
+}
+
+export async function getStaticProps() {
+  const allPosts = getAllPosts();
+  return {
+    props: {
+      posts: allPosts.map(({ data, content, slug }) => ({
+        ...data,
+        date: data.date.toString(),
+        content,
+        slug,
+      })),
+    },
+  };
+}
+
+function PostListItem({ slug, title, date, content }) {
+  return (
+    <div>
+      <div>
+        <Link href={`/blog/${slug}`}>
+          <a>{title}</a>
+        </Link>
+      </div>
+      <div>{date}</div>
+      <div>
+        {formatDistance(subDays(new Date(), 13), new Date(), {
+          addSuffix: true,
+        })}
+      </div>
+      <div>{content.substr(0, 300)}</div>
+    </div>
   );
 }
